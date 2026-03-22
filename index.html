@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Hub — VCE PE Unit 3 AOS1</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a18;
+    --text2: #5a5a55;
+    --text3: #8a8a84;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark: #0F6E56;
+    --teal-xdark: #085041;
+    --purple-light: #EEEDFE;
+    --purple: #534AB7;
+    --blue-light: #E6F1FB;
+    --blue: #185FA5;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18;
+      --surface: #242422;
+      --surface2: #2e2e2c;
+      --border: rgba(255,255,255,0.1);
+      --border-strong: rgba(255,255,255,0.2);
+      --text: #e8e6de;
+      --text2: #a8a69e;
+      --text3: #6a6a62;
+      --teal-light: #0a3328;
+      --teal-dark: #5DCAA5;
+      --teal-xdark: #9FE1CB;
+      --purple-light: #1e1c3e;
+      --blue-light: #0c2240;
+    }
+  }
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+  /* ===== LAYOUT ===== */
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+  .content { padding: 1.25rem 1rem; max-width: 860px; margin: 0 auto; width: 100%; }
+
+  /* ===== HEADER ===== */
+  .header { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 0 1.25rem; display: flex; align-items: center; justify-content: space-between; height: 52px; position: sticky; top: 0; z-index: 100; }
+  .logo { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+  .logo span { color: var(--teal); }
+  .unit-badge { font-size: 12px; background: var(--teal-light); color: var(--teal-xdark); padding: 3px 10px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+
+  /* ===== NAV ===== */
+  .nav { background: var(--surface); border-bottom: 0.5px solid var(--border); display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn { font-size: 13px; padding: 12px 15px; border: none; background: none; cursor: pointer; color: var(--text2); border-bottom: 2px solid transparent; white-space: nowrap; font-family: inherit; transition: color 0.15s; flex-shrink: 0; }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 500; }
+
+  /* ===== SECTION VISIBILITY ===== */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ===== PAGE HEADERS ===== */
+  .page-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
+  .page-sub { font-size: 14px; color: var(--text2); margin-bottom: 1.25rem; }
+
+  /* ===== CARDS ===== */
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .card-body { font-size: 14px; line-height: 1.7; color: var(--text2); }
+
+  /* ===== TOPIC CHIPS ===== */
+  .topic-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+  .topic-chip { background: var(--surface2); border: 0.5px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; cursor: pointer; font-family: inherit; color: var(--text2); transition: all 0.15s; font-weight: 500; }
+  .topic-chip:hover, .topic-chip.active { background: var(--teal-light); border-color: var(--teal); color: var(--teal-xdark); }
+  .summary-content { display: none; }
+  .summary-content.active { display: block; }
+
+  /* ===== TABLES ===== */
+  .table-wrap { overflow-x: auto; margin: 1rem 0; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 420px; }
+  th { background: var(--surface2); padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 0.5px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text2); }
+  td { padding: 8px 12px; border-bottom: 0.5px solid var(--border); color: var(--text2); vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ===== FLASHCARDS ===== */
+  .flashcard-scene { perspective: 1000px; margin: 0 auto 1.25rem; max-width: 540px; }
+  .flashcard { width: 100%; min-height: 200px; position: relative; transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .fc-face { position: absolute; width: 100%; min-height: 200px; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: var(--radius-lg); border: 0.5px solid var(--border); background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.5rem; text-align: center; }
+  .fc-back { transform: rotateY(180deg); background: var(--teal-light); border-color: var(--teal); }
+  .fc-label { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+  .fc-term { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .fc-def { font-size: 14px; line-height: 1.65; color: var(--teal-xdark); }
+  .fc-hint { font-size: 12px; color: var(--text3); margin-top: 10px; }
+  .fc-controls { display: flex; align-items: center; justify-content: space-between; max-width: 540px; margin: 0 auto 1rem; }
+  .fc-counter { font-size: 13px; color: var(--text2); font-weight: 500; }
+
+  /* ===== BUTTONS ===== */
+  .btn { padding: 8px 18px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); cursor: pointer; font-size: 13px; font-family: inherit; color: var(--text); transition: background 0.12s, transform 0.1s; font-weight: 500; }
+  .btn:hover { background: var(--surface2); }
+  .btn:active { transform: scale(0.97); }
+  .btn.primary { background: var(--teal); color: white; border-color: var(--teal); }
+  .btn.primary:hover { background: var(--teal-dark); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ===== MCQ / QUIZ ===== */
+  .quiz-q { font-size: 15px; font-weight: 600; margin-bottom: 1rem; line-height: 1.5; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .quiz-opt { padding: 10px 14px; border: 0.5px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 14px; background: var(--surface); transition: all 0.12s; text-align: left; font-family: inherit; color: var(--text); line-height: 1.5; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--teal); background: var(--teal-light); }
+  .quiz-opt.correct { border-color: var(--teal); background: var(--teal-light); color: var(--teal-xdark); font-weight: 500; }
+  .quiz-opt.incorrect { border-color: #D85A30; background: #FAECE7; color: #4A1B0C; }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-feedback { font-size: 13px; line-height: 1.65; padding: 10px 14px; border-radius: var(--radius); margin-bottom: 1rem; display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: var(--teal-light); color: var(--teal-xdark); border-left: 3px solid var(--teal); }
+  .quiz-feedback.incorrect { background: #FAECE7; color: #4A1B0C; border-left: 3px solid #D85A30; }
+  .progress-bar { height: 4px; background: var(--surface2); border-radius: 2px; margin-bottom: 1.25rem; }
+  .progress-fill { height: 4px; background: var(--teal); border-radius: 2px; transition: width 0.3s ease; }
+  .quiz-score { font-size: 24px; font-weight: 600; text-align: center; margin: 1.5rem 0 4px; letter-spacing: -0.02em; }
+  .quiz-score-sub { font-size: 14px; color: var(--text2); text-align: center; margin-bottom: 1.25rem; }
+
+  /* ===== SHORT ANSWER ===== */
+  .sa-prompt { font-size: 14px; font-weight: 500; margin-bottom: 1rem; line-height: 1.55; background: var(--surface2); padding: 12px; border-radius: var(--radius); color: var(--text); }
+  .marks-badge { font-size: 12px; background: var(--blue-light); color: var(--blue); padding: 2px 8px; border-radius: 10px; font-weight: 500; margin-left: 6px; white-space: nowrap; }
+
+  /* ===== TEXTAREA ===== */
+  .ai-textarea { width: 100%; min-height: 150px; padding: 12px; border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text); resize: vertical; transition: border-color 0.15s; }
+  .ai-textarea:focus { outline: none; border-color: var(--teal); }
+
+  /* ===== GLOSSARY ===== */
+  .glossary-search { width: 100%; padding: 10px 14px; border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 14px; background: var(--surface); font-family: inherit; color: var(--text); margin-bottom: 1rem; transition: border-color 0.15s; }
+  .glossary-search:focus { outline: none; border-color: var(--teal); }
+  .glossary-item { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+  .glossary-item:last-child { border-bottom: none; }
+  .g-term { font-size: 14px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .g-def { font-size: 13px; color: var(--text2); line-height: 1.65; }
+  .g-tag { font-size: 11px; background: var(--surface2); color: var(--text3); padding: 2px 7px; border-radius: 10px; font-weight: 500; }
+
+  /* ===== AI FEEDBACK ===== */
+  .ai-input-row { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+  .ai-input-row input { flex: 1; min-width: 200px; padding: 10px 14px; border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text); }
+  .ai-input-row input:focus { outline: none; border-color: var(--teal); }
+  .ai-response { font-size: 14px; line-height: 1.75; color: var(--text2); white-space: pre-wrap; }
+  .ai-loading { color: var(--text3); font-size: 14px; font-style: italic; }
+  .ai-error { color: #D85A30; font-size: 14px; }
+
+  /* ===== EXAM TIP BLOCK ===== */
+  .tip-block { background: var(--purple-light); border-left: 3px solid var(--purple); border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 14px; margin-top: 10px; font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .content { padding: 1rem 0.75rem; }
+    .fc-term { font-size: 18px; }
+    .header { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">Study<span>Hub</span></div>
+    <div class="unit-badge">Unit 3 AOS1 — Motor Learning</div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav" id="main-nav">
+    <button class="nav-btn active" onclick="showSection('summary')">Key Knowledge</button>
+    <button class="nav-btn" onclick="showSection('flashcards')">Flashcards</button>
+    <button class="nav-btn" onclick="showSection('mcq')">MCQ Practice</button>
+    <button class="nav-btn" onclick="showSection('short-answer')">Short Answer</button>
+    <button class="nav-btn" onclick="showSection('glossary')">Glossary</button>
+    <button class="nav-btn" onclick="showSection('ai')">AI Feedback</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ==================== KEY KNOWLEDGE ==================== -->
+    <div class="section active" id="section-summary">
+      <div class="page-title">Key Knowledge</div>
+      <div class="page-sub">Unit 3 AOS1 — Motor Learning &amp; Coaching. Select a topic to study.</div>
+      <div class="topic-grid">
+        <button class="topic-chip active" onclick="showTopic('stages', this)">Stages of learning</button>
+        <button class="topic-chip" onclick="showTopic('classif', this)">Skill classification</button>
+        <button class="topic-chip" onclick="showTopic('practice', this)">Practice types</button>
+        <button class="topic-chip" onclick="showTopic('feedback', this)">Feedback</button>
+        <button class="topic-chip" onclick="showTopic('coaching', this)">Coaching</button>
+      </div>
+
+      <!-- TOPIC: STAGES -->
+      <div class="summary-content active" id="topic-stages">
+        <div class="card">
+          <div class="card-title">Stages of learning — Fitts &amp; Posner (1967)</div>
+          <div class="card-body">
+            <p style="margin-bottom:12px">Fitts and Posner describe skill acquisition across three stages, each with distinct characteristics in attention demand, movement quality, and error detection ability.</p>
+            <div class="table-wrap">
+              <table>
+                <tr><th>Stage</th><th>Also called</th><th>Key characteristics</th><th>Attention demand</th></tr>
+                <tr><td><strong>Cognitive</strong></td><td>Verbal-motor</td><td>Large performance gains; many errors; inconsistent; relies on verbal instructions and demonstrations; thinks about each movement step</td><td>Very high — focus on what to do</td></tr>
+                <tr><td><strong>Associative</strong></td><td>Motor stage</td><td>Fewer errors; movements smoother; self-evaluation begins; gradual, smaller improvements over time</td><td>Moderate — refining how to do it</td></tr>
+                <tr><td><strong>Autonomous</strong></td><td>Automatic stage</td><td>Highly consistent; movement is automatic; can detect and correct own errors; attention freed for tactics and environment</td><td>Low — skill runs on autopilot</td></tr>
+              </table>
+            </div>
+            <div class="tip-block">Exam tip: Always link the stage of learning to the appropriate practice type, feedback type, and coaching strategy. Cognitive learners need frequent, specific KP; autonomous learners benefit from bandwidth/summary feedback and random practice.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Bernstein's model of motor learning</div>
+          <div class="card-body">
+            <p>Bernstein proposed that learners manage complexity by controlling <em>degrees of freedom</em> (the independent components of the movement system).</p>
+            <div class="table-wrap">
+              <table>
+                <tr><th>Phase</th><th>What happens</th></tr>
+                <tr><td><strong>Freeze</strong></td><td>Novice restricts joint movement to simplify control — movement appears stiff and robotic</td></tr>
+                <tr><td><strong>Release</strong></td><td>As skill improves, degrees of freedom are progressively unlocked — movement becomes more fluid</td></tr>
+                <tr><td><strong>Exploit</strong></td><td>Expert uses reactive/passive forces (momentum, gravity) for economical, efficient movement</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOPIC: CLASSIFICATION -->
+      <div class="summary-content" id="topic-classif">
+        <div class="card">
+          <div class="card-title">Skill classification continua</div>
+          <div class="card-body">
+            <p style="margin-bottom:12px">Skills are not classified as purely one type — they sit on continua. Use precise language: "this skill tends toward the open end of the open–closed continuum because…"</p>
+            <div class="table-wrap">
+              <table>
+                <tr><th>Continuum</th><th>One end</th><th>Other end</th><th>Sport examples</th></tr>
+                <tr><td>Muscular involvement</td><td>Gross (large muscle groups)</td><td>Fine (small, precise muscles)</td><td>Sprinting (gross); dart throw (fine)</td></tr>
+                <tr><td>Environmental context</td><td>Open (unpredictable environment)</td><td>Closed (stable, predictable)</td><td>Netball pass (open); gymnastics vault (closed)</td></tr>
+                <tr><td>Discreteness</td><td>Discrete (clear start/end)</td><td>Continuous (no clear start/end)</td><td>Penalty kick (disc); cycling (cont); triple jump (serial)</td></tr>
+                <tr><td>Pacing</td><td>Externally paced</td><td>Self-paced</td><td>Batting in cricket (ext); golf drive (self)</td></tr>
+              </table>
+            </div>
+            <div class="tip-block">Exam tip: When classifying a skill, name the continuum, identify where the skill sits on it, AND justify with a specific feature of the skill or its environment. Avoid one-word answers.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Why classification matters for coaching</div>
+          <div class="card-body">Skill classification directly informs practice design. Open, externally paced skills require variable practice in representative, unpredictable environments to build adaptability. Closed, self-paced skills benefit from blocked, repetitive practice to build automaticity and a strong motor programme. Gross skills with complex serial structure may suit part-practice; continuous skills suit whole-practice to preserve rhythm and timing.</div>
+        </div>
+      </div>
+
+      <!-- TOPIC: PRACTICE -->
+      <div class="summary-content" id="topic-practice">
+        <div class="card">
+          <div class="card-title">Practice types — overview</div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <tr><th>Practice type</th><th>Description</th><th>Best suited to</th><th>Key consideration</th></tr>
+                <tr><td><strong>Massed</strong></td><td>Continuous — minimal rest between trials</td><td>Simple, closed skills; motivated, fit, experienced performers</td><td>Risk of fatigue and injury; not ideal for beginners or complex skills</td></tr>
+                <tr><td><strong>Distributed</strong></td><td>Intervals of rest or different activity between trials</td><td>Complex/fatiguing tasks; cognitive stage learners; dangerous skills</td><td>Better long-term learning outcomes for most beginners</td></tr>
+                <tr><td><strong>Blocked</strong></td><td>Same skill practised repeatedly before moving on</td><td>Cognitive stage; building a motor programme</td><td>Feels productive short-term; lower retention than random</td></tr>
+                <tr><td><strong>Random</strong></td><td>Different skills in unpredictable order</td><td>Associative/autonomous; improving transfer and retention</td><td>Contextual interference effect — harder but better for retention</td></tr>
+                <tr><td><strong>Whole</strong></td><td>Complete skill practised in its entirety</td><td>Low-complexity; highly integrated/continuous skills</td><td>Preserves timing and rhythm</td></tr>
+                <tr><td><strong>Part</strong></td><td>Skill broken into subroutines practised separately</td><td>Complex serial skills; dangerous skills; beginners</td><td>Must eventually recombine — progressive part practice is a good bridge</td></tr>
+                <tr><td><strong>Variable</strong></td><td>Varying parameters (speed, distance, angle) of the same skill</td><td>Open skills; building schema for transfer</td><td>Essential for competition preparation</td></tr>
+                <tr><td><strong>Mental</strong></td><td>Cognitive rehearsal without physical movement</td><td>All stages; injury rehabilitation; pre-competition routine</td><td>Most effective combined with physical practice</td></tr>
+              </table>
+            </div>
+            <div class="tip-block">Contextual interference: Random practice creates interference that is desirable — it forces the learner to reconstruct the motor programme each trial, improving long-term retention and transfer even though immediate performance looks worse than blocked practice.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOPIC: FEEDBACK -->
+      <div class="summary-content" id="topic-feedback">
+        <div class="card">
+          <div class="card-title">Feedback — types and classification</div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <tr><th>Category</th><th>Type</th><th>Definition</th></tr>
+                <tr><td rowspan="2">Source</td><td>Intrinsic (internal)</td><td>Sensory information arising from within the body — proprioception, kinaesthesia, vestibular input</td></tr>
+                <tr><td>Augmented (external)</td><td>Supplementary information from an outside source — coach, video, timing devices</td></tr>
+                <tr><td rowspan="2">Augmented subtypes</td><td>Knowledge of Results (KR)</td><td>Information about the outcome of the movement (e.g. score, time, distance)</td></tr>
+                <tr><td>Knowledge of Performance (KP)</td><td>Information about the movement pattern itself (e.g. technique cues, biomechanical errors)</td></tr>
+                <tr><td rowspan="3">Timing</td><td>Concurrent</td><td>Delivered during the movement (e.g. coach calling cues mid-action)</td></tr>
+                <tr><td>Terminal</td><td>Delivered immediately after the movement is complete</td></tr>
+                <tr><td>Delayed</td><td>Terminal feedback given after a time gap (e.g. post-game video review)</td></tr>
+                <tr><td rowspan="2">Schedule</td><td>Summary</td><td>Given after a set number of trials (e.g. every 5 attempts)</td></tr>
+                <tr><td>Bandwidth</td><td>Given only when performance falls outside an acceptable error range</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Feedback &amp; stage of learning</div>
+          <div class="card-body">
+            <p style="margin-bottom:10px">The type and frequency of feedback should be matched to the learner's stage:</p>
+            <ul style="font-size:14px; color:var(--text2); line-height:1.9; padding-left:18px">
+              <li><strong>Cognitive stage:</strong> Frequent, specific KP — helps build accurate mental reference of correct movement; concurrent and terminal feedback both appropriate</li>
+              <li><strong>Associative stage:</strong> Reduce frequency; encourage self-evaluation; introduce summary feedback; specific KP still valuable for refining errors</li>
+              <li><strong>Autonomous stage:</strong> Bandwidth or summary feedback — promotes self-reliance; over-provision of augmented feedback can cause dependency and impair intrinsic processing</li>
+            </ul>
+            <div class="tip-block">Exam tip: Explain <em>why</em> a feedback type is appropriate — link frequency and type to the learner's ability to detect and correct their own errors. Never just name a feedback type without justification.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOPIC: COACHING -->
+      <div class="summary-content" id="topic-coaching">
+        <div class="card">
+          <div class="card-title">Coaching strategies</div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <tr><th>Strategy</th><th>Description</th><th>Most effective stage</th></tr>
+                <tr><td>Verbal cues</td><td>Short, specific movement instructions targeting key technique points</td><td>All stages; especially cognitive</td></tr>
+                <tr><td>Demonstration / modelling</td><td>Providing a visual model of the correct movement (Bandura's observational learning)</td><td>Cognitive — helps establish a mental image</td></tr>
+                <tr><td>Manual guidance</td><td>Physical assistance guiding the learner through the movement</td><td>Cognitive; must be faded to avoid dependency</td></tr>
+                <tr><td>Video analysis</td><td>Reviewing recorded performance — augmented KP</td><td>Associative/autonomous — requires ability to self-analyse</td></tr>
+                <tr><td>Questioning</td><td>Open questions promoting self-reflection and metacognition</td><td>Associative/autonomous</td></tr>
+                <tr><td>Goal setting</td><td>Process goals (technique) suit cognitive; outcome goals suit autonomous</td><td>All stages — goal type changes</td></tr>
+                <tr><td>Modifying the practice environment</td><td>Adjusting task constraints (equipment, rules, space) to focus on specific skills</td><td>All stages</td></tr>
+              </table>
+            </div>
+            <div class="tip-block">VCAA exam focus: Examiners reward responses that justify coaching decisions with reference to (1) the characteristics of the skill, (2) the stage of learning, and (3) the specific aim of the session. Avoid generic responses.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FLASHCARDS ==================== -->
+    <div class="section" id="section-flashcards">
+      <div class="page-title">Flashcards</div>
+      <div class="page-sub">Tap a card to reveal the definition. Use arrows to navigate.</div>
+      <div class="flashcard-scene">
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="fc-face fc-front">
+            <div class="fc-label">Term</div>
+            <div class="fc-term" id="fc-term">Cognitive stage</div>
+            <div class="fc-hint">Tap to reveal</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-label">Definition</div>
+            <div class="fc-def" id="fc-def"></div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-controls">
+        <button class="btn" onclick="fcNav(-1)">← Prev</button>
+        <div class="fc-counter"><span id="fc-current">1</span> / <span id="fc-total">20</span></div>
+        <button class="btn" onclick="fcNav(1)">Next →</button>
+      </div>
+      <div class="btn-row" style="justify-content:center; margin-top:10px;">
+        <button class="btn primary" onclick="shuffleCards()">Shuffle deck</button>
+        <button class="btn" onclick="fcNav(1)">Skip</button>
+      </div>
+    </div>
+
+    <!-- ==================== MCQ ==================== -->
+    <div class="section" id="section-mcq">
+      <div class="page-title">MCQ Practice</div>
+      <div class="page-sub">Choose the best answer. Detailed feedback shown after each question.</div>
+      <div id="mcq-container"></div>
+    </div>
+
+    <!-- ==================== SHORT ANSWER ==================== -->
+    <div class="section" id="section-short-answer">
+      <div class="page-title">Short answer practice</div>
+      <div class="page-sub">Exam-style questions. Write your response, then use the AI Feedback tab to get it marked.</div>
+      <div id="sa-container"></div>
+    </div>
+
+    <!-- ==================== GLOSSARY ==================== -->
+    <div class="section" id="section-glossary">
+      <div class="page-title">Glossary</div>
+      <div class="page-sub">Key terms for Unit 3 AOS1. Search to filter by term or definition.</div>
+      <input class="glossary-search" type="text" id="gloss-search" placeholder="Search terms…" oninput="filterGlossary()" />
+      <div id="glossary-list"></div>
+    </div>
+
+    <!-- ==================== AI FEEDBACK ==================== -->
+    <div class="section" id="section-ai">
+      <div class="page-title">AI Feedback</div>
+      <div class="page-sub">Paste a short answer response below to receive VCE-style examiner feedback powered by Claude.</div>
+      <div id="ai-content">
+        <div class="card">
+          <div class="card-title">Exam question</div>
+          <div class="card-body" id="ai-prompt-display" style="font-style:italic; color:var(--text2);">Select a question from the Short Answer tab, or type your own question in the field below.</div>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:13px; color:var(--text2); margin-bottom:6px; font-weight:500;">Custom question (optional)</label>
+          <input type="text" id="ai-custom-q" placeholder="Type or paste the exam question here…" style="width:100%; padding:10px 14px; border:0.5px solid var(--border); border-radius:var(--radius); font-size:14px; font-family:inherit; background:var(--surface); color:var(--text);" />
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:13px; color:var(--text2); margin-bottom:6px; font-weight:500;">Your answer</label>
+          <textarea class="ai-textarea" id="ai-student-response" placeholder="Write or paste your answer here…"></textarea>
+        </div>
+        <button class="btn primary" onclick="getAIFeedback()" style="width:100%; padding:12px;">Get examiner feedback</button>
+        <div class="card" id="ai-result" style="display:none; margin-top:1rem;">
+          <div class="card-title">Examiner feedback</div>
+          <div id="ai-response-text" class="ai-response"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<script>
+// ===== FLASHCARD DATA =====
+const flashcards = [
+  {term:"Cognitive stage",def:"First stage of Fitts & Posner's model. Characterised by high cognitive demand, many errors, large performance gains, and reliance on augmented feedback. The learner focuses on what to do."},
+  {term:"Associative stage",def:"Second stage. Fewer errors, smoother movement, self-evaluation begins. The learner refines technique and starts to detect and correct their own errors."},
+  {term:"Autonomous stage",def:"Third stage. Movement is automatic, highly consistent, and requires minimal conscious attention. Attentional resources are freed for strategy, tactics, and reading the environment."},
+  {term:"Intrinsic feedback",def:"Sensory feedback arising from within the performer — proprioception, kinaesthesia, and vestibular input. Available during and after the movement."},
+  {term:"Augmented feedback",def:"Supplementary feedback from an external source (coach, video, timing device). Includes both KR and KP. Essential for cognitive stage learners building their reference of correctness."},
+  {term:"Knowledge of Results (KR)",def:"Feedback about the outcome of the movement — did it achieve the goal? E.g. 'your shot percentage was 40%'. External and typically terminal."},
+  {term:"Knowledge of Performance (KP)",def:"Feedback about the quality of the movement pattern itself. E.g. 'your elbow dropped on release'. Helps the learner correct technique rather than just outcome."},
+  {term:"Massed practice",def:"Continuous practice with little or no rest intervals. Suits simple, closed skills and motivated, experienced performers. Risk of fatigue for beginners or complex tasks."},
+  {term:"Distributed practice",def:"Practice interspersed with rest or alternative activities. Better for complex, fatiguing, or dangerous skills and for learners in the cognitive stage."},
+  {term:"Blocked practice",def:"Practising one skill repeatedly before moving to the next. Builds motor programme; best for cognitive stage. Lower retention and transfer than random practice."},
+  {term:"Random practice",def:"Skills practised in an unpredictable order. Produces contextual interference, improving long-term retention and transfer, though immediate performance looks worse."},
+  {term:"Whole practice",def:"Skill performed in its entirety. Suits low-complexity or highly integrated/continuous skills where breaking the movement apart disrupts timing and rhythm."},
+  {term:"Part practice",def:"Skill broken into subroutines practised separately before being combined. Suits complex serial skills or movements that are dangerous to attempt in full."},
+  {term:"Variable practice",def:"Practising a skill under varied conditions or with varied parameters. Builds schema and improves transfer to open, unpredictable competition environments."},
+  {term:"Mental practice",def:"Cognitive rehearsal of a skill without physical movement. Reinforces motor programme, maintains skill during injury, and supports pre-competition routine."},
+  {term:"Open skill",def:"A skill performed in an unpredictable, changing environment where the performer must constantly adapt (e.g. receiving a pass in football)."},
+  {term:"Closed skill",def:"A skill performed in a stable, predictable, self-controlled environment with no external interference (e.g. a gymnastics vault, a golf putt)."},
+  {term:"Contextual interference",def:"Interference created by practising multiple skills in random order. Reduces short-term performance but significantly enhances long-term retention and transfer."},
+  {term:"Bandwidth feedback",def:"Augmented feedback given only when performance falls outside an acceptable error range. Encourages self-evaluation. Most appropriate for associative and autonomous learners."},
+  {term:"Degrees of freedom (Bernstein)",def:"The independent components of a movement system that must be controlled. Novice learners freeze DOF to simplify movement; experts release and exploit them for efficiency."},
+];
+
+let fcIndex = 0;
+let fcOrder = [...Array(flashcards.length).keys()];
+
+function updateCard() {
+  const card = flashcards[fcOrder[fcIndex]];
+  document.getElementById('fc-term').textContent = card.term;
+  document.getElementById('fc-def').textContent = card.def;
+  document.getElementById('fc-current').textContent = fcIndex + 1;
+  document.getElementById('fc-total').textContent = flashcards.length;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function fcNav(dir) {
+  fcIndex = (fcIndex + dir + flashcards.length) % flashcards.length;
+  updateCard();
+}
+
+function shuffleCards() {
+  for (let i = fcOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [fcOrder[i], fcOrder[j]] = [fcOrder[j], fcOrder[i]];
+  }
+  fcIndex = 0;
+  updateCard();
+}
+
+// ===== MCQ DATA =====
+const mcqData = [
+  {q:"A gymnast performs a vault the same way every session and has done so for 3 years, with minimal conscious attention to technique. At which stage of learning is she MOST likely operating?",opts:["Cognitive","Associative","Autonomous","Pre-motor"],correct:2,exp:"The gymnast demonstrates high consistency, automaticity, and minimal conscious attention — all hallmarks of the autonomous stage. The stable, closed nature of the vault also supports development to this stage."},
+  {q:"Which type of practice BEST supports long-term retention and transfer to competition for an open, externally paced skill?",opts:["Blocked, massed","Whole, massed","Random, variable","Part, distributed"],correct:2,exp:"Random practice creates contextual interference, improving retention and transfer. Variable practice conditions suit open skills by replicating the unpredictability of competition environments."},
+  {q:"A coach tells a basketball player: 'Your shooting percentage from the three-point line was 60% in that set.' This is BEST classified as:",opts:["Intrinsic feedback","Knowledge of Performance","Knowledge of Results","Concurrent feedback"],correct:2,exp:"Knowledge of Results (KR) relates to the outcome of performance. Shooting percentage is an outcome measure. KP would describe the movement pattern (e.g. arm action, follow-through)."},
+  {q:"Which of the following BEST describes bandwidth feedback?",opts:["Feedback given after every single trial","Feedback given only when performance falls outside an acceptable range","Feedback given during the movement","Feedback arising from internal sensory receptors"],correct:1,exp:"Bandwidth feedback is only provided when the performer's output deviates beyond a set tolerance. This promotes self-evaluation and is most appropriate for associative and autonomous stage learners."},
+  {q:"A tennis coach uses part practice when teaching a beginner to serve. Which characteristic of the serve BEST justifies this decision?",opts:["It is a self-paced, closed skill","It is a complex, serial skill with distinct subroutines","It is performed in a variable environment","It requires fine muscular involvement"],correct:1,exp:"Part practice is best justified for complex, serial skills where distinct subroutines can be identified and practised separately (toss, backswing, contact, follow-through). This reduces cognitive load for beginners in the cognitive stage."},
+  {q:"According to Bernstein's model, what characterises the EARLIEST phase of learning a new motor skill?",opts:["Degrees of freedom are exploited for efficient movement","Degrees of freedom are progressively released","Degrees of freedom are frozen to simplify control","Reactive forces are maximised"],correct:2,exp:"Bernstein proposed that novice learners freeze degrees of freedom — restricting joint movement to reduce the complexity of control. Degrees of freedom are gradually released as skill improves."},
+  {q:"A football coach provides feedback to a player only after every 5 kicks. This scheduling of feedback is BEST described as:",opts:["Concurrent feedback","Bandwidth feedback","Summary feedback","Delayed KP"],correct:2,exp:"Summary feedback is provided after a set number of trials (every 5 kicks in this case). It promotes self-reflection between trials and reduces dependence on external feedback."},
+  {q:"A learner is described as having movements that are smoother than when they started, making fewer errors, but still requiring considerable focus on technique. This is MOST consistent with which stage?",opts:["Cognitive","Associative","Autonomous","Preparatory"],correct:1,exp:"The associative stage is characterised by smoother, more refined movements with fewer errors, but the learner still directs significant attention to technique. Full automaticity is not yet reached."},
+];
+
+let mcqState = [];
+let mcqScore = 0;
+
+function buildMCQ() {
+  mcqScore = 0;
+  mcqState = mcqData.map(() => ({ answered: false }));
+  const c = document.getElementById('mcq-container');
+  c.innerHTML = '';
+
+  const prog = document.createElement('div');
+  prog.className = 'progress-bar';
+  prog.innerHTML = '<div class="progress-fill" id="mcq-progress" style="width:0%"></div>';
+  c.appendChild(prog);
+
+  mcqData.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.id = 'mcq-' + qi;
+    div.innerHTML = '<div class="quiz-q">' + (qi + 1) + '. ' + q.q + '</div>' +
+      '<div class="quiz-opts">' + q.opts.map((o, oi) =>
+        '<button class="quiz-opt" onclick="answerMCQ(' + qi + ',' + oi + ')">' + String.fromCharCode(65 + oi) + '. ' + o + '</button>'
+      ).join('') + '</div>' +
+      '<div class="quiz-feedback" id="mcqfb-' + qi + '"></div>';
+    c.appendChild(div);
+  });
+
+  const scoreDiv = document.createElement('div');
+  scoreDiv.id = 'mcq-score';
+  scoreDiv.style.display = 'none';
+  c.appendChild(scoreDiv);
+}
+
+function answerMCQ(qi, oi) {
+  if (mcqState[qi].answered) return;
+  mcqState[qi].answered = true;
+  const q = mcqData[qi];
+  const opts = document.querySelectorAll('#mcq-' + qi + ' .quiz-opt');
+  opts.forEach(o => { o.disabled = true; });
+  opts[q.correct].classList.add('correct');
+  const fb = document.getElementById('mcqfb-' + qi);
+  if (oi === q.correct) {
+    mcqScore++;
+    fb.className = 'quiz-feedback show correct';
+    fb.textContent = 'Correct! ' + q.exp;
+  } else {
+    opts[oi].classList.add('incorrect');
+    fb.className = 'quiz-feedback show incorrect';
+    fb.textContent = 'Not quite. ' + q.exp;
+  }
+  const answered = mcqState.filter(s => s.answered).length;
+  document.getElementById('mcq-progress').style.width = Math.round(answered / mcqData.length * 100) + '%';
+  if (answered === mcqData.length) {
+    const sd = document.getElementById('mcq-score');
+    sd.style.display = 'block';
+    sd.innerHTML = '<div class="quiz-score">' + mcqScore + ' / ' + mcqData.length + '</div>' +
+      '<div class="quiz-score-sub">' + (mcqScore >= 6 ? 'Great work! Review any incorrect items above.' : 'Keep going — review the explanations and try again.') + '</div>' +
+      '<div style="display:flex;justify-content:center;margin-top:12px;"><button class="btn primary" onclick="buildMCQ()">Retry quiz</button></div>';
+  }
+}
+
+// ===== SHORT ANSWER DATA =====
+const saQuestions = [
+  { q: "Describe two characteristics of a learner in the cognitive stage of learning and explain one appropriate coaching strategy for each characteristic.", marks: 4 },
+  { q: "Justify the use of variable practice when preparing a netball player for competition. In your response, refer to the nature of the skill and the type of feedback that would best support this player.", marks: 4 },
+  { q: "Explain how contextual interference affects skill learning and retention. Use a sport-specific example to support your answer.", marks: 3 },
+  { q: "A hockey coach is deciding between whole practice and part practice for teaching a complex drag flick to an intermediate player. Recommend and justify one of these approaches, referring to the learner's stage of learning.", marks: 3 },
+  { q: "Compare massed and distributed practice. For each type, identify one skill and one type of learner for which it is most appropriate, and justify your choices.", marks: 4 },
+];
+
+function buildSA() {
+  const c = document.getElementById('sa-container');
+  c.innerHTML = '';
+  saQuestions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = '<div class="sa-prompt">Q' + (i + 1) + '. ' + q.q + ' <span class="marks-badge">' + q.marks + ' marks</span></div>' +
+      '<textarea class="ai-textarea" id="sa-ans-' + i + '" placeholder="Write your response here…"></textarea>' +
+      '<div class="btn-row" style="margin-top:10px;"><button class="btn primary" onclick="sendToAI(' + i + ')">Get AI feedback</button></div>';
+    c.appendChild(div);
+  });
+}
+
+function sendToAI(i) {
+  const ans = document.getElementById('sa-ans-' + i).value.trim();
+  if (!ans) { alert('Please write an answer first.'); return; }
+  showSection('ai');
+  document.getElementById('ai-prompt-display').textContent = saQuestions[i].q;
+  document.getElementById('ai-student-response').value = ans;
+  document.getElementById('ai-custom-q').value = '';
+  getAIFeedback();
+}
+
+// ===== AI FEEDBACK =====
+// IMPORTANT: Replace YOUR_API_KEY_HERE with your actual Anthropic API key before publishing.
+// Keep this key private — do not share the source code publicly once the key is added.
+const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';
+
+async function getAIFeedback() {
+  const studentAns = document.getElementById('ai-student-response').value.trim();
+  const customQ = document.getElementById('ai-custom-q').value.trim();
+  const promptDisplay = document.getElementById('ai-prompt-display').textContent;
+  if (!studentAns) { alert('Please enter a response first.'); return; }
+  const examQ = customQ || (promptDisplay.includes('Select a question') ? '' : promptDisplay);
+  if (!examQ) { alert('Please select a question from the Short Answer tab, or type a custom question.'); return; }
+  if (ANTHROPIC_API_KEY === 'YOUR_API_KEY_HERE') {
+    document.getElementById('ai-result').style.display = 'block';
+    document.getElementById('ai-response-text').innerHTML = '<span class="ai-error">API key not set. Please add your Anthropic API key to the code before using this feature. See the setup guide for instructions.</span>';
+    return;
+  }
+  const resultDiv = document.getElementById('ai-result');
+  const responseText = document.getElementById('ai-response-text');
+  resultDiv.style.display = 'block';
+  responseText.innerHTML = '<span class="ai-loading">Analysing your response…</span>';
+
+  const systemPrompt = `You are an experienced VCE Physical Education examiner with deep knowledge of the VCAA Unit 3 AOS1 (Motor Learning & Coaching) study design.
+Provide structured, constructive feedback in the style of a VCAA examiner's report.
+Your feedback must:
+1. Acknowledge what the student did well (specific to their actual response)
+2. Identify gaps, errors, or missing terminology with reference to study design language
+3. Offer a brief model phrase or improvement suggestion
+Be specific, encouraging, and educational. Keep feedback to 150-200 words. Use plain text — no markdown, no asterisks, no bullet symbols.`;
+
+  const userMsg = 'Exam question: ' + examQ + '\n\nStudent response: ' + studentAns + '\n\nProvide VCE-style examiner feedback.';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-calls': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) {
+      responseText.innerHTML = '<span class="ai-error">Error: ' + data.error.message + '</span>';
+    } else {
+      const text = (data.content || []).map(b => b.text || '').join('');
+      responseText.textContent = text || 'No response received.';
+    }
+  } catch (e) {
+    responseText.innerHTML = '<span class="ai-error">Could not connect. Please check your internet connection and try again.</span>';
+  }
+}
+
+// ===== GLOSSARY DATA =====
+const glossaryData = [
+  { term: "Augmented feedback", def: "Supplementary feedback from an external source, including a coach, video replay, or timing device. Includes KR and KP.", tag: "Feedback" },
+  { term: "Autonomous stage", def: "Third stage of Fitts & Posner's model. Skill is automatic, highly consistent, and requires minimal conscious attention.", tag: "Stages" },
+  { term: "Bandwidth feedback", def: "Feedback given only when performance falls outside an acceptable error range. Promotes self-evaluation in advanced learners.", tag: "Feedback" },
+  { term: "Bernstein's model", def: "Proposes that learners freeze, then release, then exploit degrees of freedom as skill develops and movement becomes more efficient.", tag: "Stages" },
+  { term: "Blocked practice", def: "Repeating one skill before moving to the next. Builds motor programme. Best for cognitive stage learners.", tag: "Practice" },
+  { term: "Closed skill", def: "A skill performed in a stable, predictable, self-controlled environment with no external interference (e.g. gymnastics vault).", tag: "Classification" },
+  { term: "Cognitive stage", def: "First stage of Fitts & Posner's model. Characterised by high cognitive demand, many errors, and large performance gains.", tag: "Stages" },
+  { term: "Concurrent feedback", def: "Augmented feedback provided during the movement itself (e.g. a coach calling cues mid-action).", tag: "Feedback" },
+  { term: "Contextual interference", def: "Interference caused by practising multiple tasks randomly. Reduces performance short-term but improves retention and transfer.", tag: "Practice" },
+  { term: "Continuous skill", def: "A skill with no clear beginning or end that flows repeatedly (e.g. cycling, swimming). Typically suited to whole practice.", tag: "Classification" },
+  { term: "Degrees of freedom", def: "The independent components of a movement system that must be controlled. Beginners freeze these to simplify movement; experts exploit them.", tag: "Stages" },
+  { term: "Discrete skill", def: "A skill with a clear beginning and end (e.g. a penalty kick, a throw).", tag: "Classification" },
+  { term: "Distributed practice", def: "Practice interspersed with rest or alternative tasks. Suited to beginners, complex skills, and fatiguing tasks.", tag: "Practice" },
+  { term: "Externally paced", def: "A skill where timing is determined by the environment or opponent (e.g. batting in cricket).", tag: "Classification" },
+  { term: "Intrinsic feedback", def: "Sensory feedback arising from within the performer — proprioception, kinaesthesia, vestibular information.", tag: "Feedback" },
+  { term: "Knowledge of Performance (KP)", def: "Augmented feedback about the quality of the movement pattern (e.g. 'your elbow dropped on the follow-through').", tag: "Feedback" },
+  { term: "Knowledge of Results (KR)", def: "Augmented feedback about the outcome of the movement (e.g. shooting percentage, time, distance).", tag: "Feedback" },
+  { term: "Massed practice", def: "Continuous practice with minimal rest. Suits simple, closed skills and highly motivated, fit, experienced performers.", tag: "Practice" },
+  { term: "Mental practice", def: "Cognitive rehearsal of a skill without physical movement. Reinforces motor programme and supports injury rehabilitation.", tag: "Practice" },
+  { term: "Motor programme", def: "A pre-structured set of muscle commands stored in memory that can be retrieved to produce movement without real-time sensory feedback.", tag: "Stages" },
+  { term: "Open skill", def: "A skill performed in an unpredictable, changing environment requiring constant adaptation (e.g. fielding in cricket, receiving a pass).", tag: "Classification" },
+  { term: "Part practice", def: "Breaking a complex skill into subroutines practised separately before combining. Suits complex serial or dangerous skills.", tag: "Practice" },
+  { term: "Random practice", def: "Practising different skills in an unpredictable order. Creates contextual interference; improves long-term retention and transfer.", tag: "Practice" },
+  { term: "Self-paced skill", def: "A skill where the performer controls the timing of execution (e.g. golf putt, free throw, gymnastics routine).", tag: "Classification" },
+  { term: "Serial skill", def: "A skill made up of a series of discrete movements performed in a specific order (e.g. triple jump, gymnastics floor routine).", tag: "Classification" },
+  { term: "Summary feedback", def: "Augmented feedback provided after a set number of trials. Promotes self-reflection and reduces external dependence.", tag: "Feedback" },
+  { term: "Variable practice", def: "Practising a skill under varied conditions or with varied parameters. Builds schema; essential for open skills and competition transfer.", tag: "Practice" },
+  { term: "Whole practice", def: "Practising the complete skill in its entirety. Best for low-complexity or highly integrated continuous skills.", tag: "Practice" },
+];
+
+function buildGlossary() { filterGlossary(); }
+
+function filterGlossary() {
+  const q = document.getElementById('gloss-search').value.toLowerCase();
+  const list = document.getElementById('glossary-list');
+  const filtered = q
+    ? glossaryData.filter(g => g.term.toLowerCase().includes(q) || g.def.toLowerCase().includes(q))
+    : glossaryData;
+  list.innerHTML = filtered.length
+    ? filtered.map(g =>
+      '<div class="glossary-item">' +
+      '<div class="g-term">' + g.term + '<span class="g-tag">' + g.tag + '</span></div>' +
+      '<div class="g-def">' + g.def + '</div></div>'
+    ).join('')
+    : '<p style="color:var(--text2);font-size:14px;padding:1rem 0">No matching terms found.</p>';
+}
+
+// ===== NAVIGATION =====
+const sectionMap = { summary: 0, flashcards: 1, mcq: 2, 'short-answer': 3, glossary: 4, ai: 5 };
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  const btns = document.querySelectorAll('.nav-btn');
+  if (btns[sectionMap[id]]) btns[sectionMap[id]].classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showTopic(id, el) {
+  document.querySelectorAll('.summary-content').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('topic-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+// ===== INIT =====
+updateCard();
+buildMCQ();
+buildSA();
+buildGlossary();
+</script>
+</body>
+</html>
